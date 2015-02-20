@@ -23,7 +23,7 @@ namespace Augusta_Flickr_Laba
 
         //request token (can save it to settings, to use it with auth)
         private static string request_token = "";
-
+        private string oauth_token = "";
 
         public Form1()
         {
@@ -40,7 +40,7 @@ namespace Augusta_Flickr_Laba
 
 
             //button press start process
-            if (ConsumerKey != "" && Secret != ""&&!ConsumerKey.Contains(" ")&&!Secret.Contains(" "))
+            if (ConsumerKey != "" && Secret != "" && !ConsumerKey.Contains(" ") && !Secret.Contains(" "))
             {
                 GetAuth();
             }
@@ -90,7 +90,7 @@ namespace Augusta_Flickr_Laba
 
             //Getting the User Authorization
             StringBuilder ab = new StringBuilder(result);
-            string oauth_token = ab.Remove(0, 42).ToString();
+            oauth_token = ab.Remove(0, 42).ToString();
             int index = 0;
             for (int i = 0; i < oauth_token.Length; i++)
                 if (oauth_token[i] == '&')
@@ -101,11 +101,7 @@ namespace Augusta_Flickr_Laba
             oauth_token = ab.Remove(index, oauth_token.Length - index).ToString();
             string authorizeString = "https://www.flickr.com/services/oauth/authorize" + "?oauth_token=" + oauth_token;
 
-           // Uri uri = new Uri(authorizeString);
-           // webBrowser1.Url = uri;
-
             webBrowser1.Navigate(new Uri(authorizeString));
-            //webBrowser1.DocumentCompleted += new WebBrowserDocumentCompletedEventHandler(webBrowser1_DocumentCompleted);
             while (webBrowser1.ReadyState != WebBrowserReadyState.Complete)
             {
                 Application.DoEvents();
@@ -122,7 +118,7 @@ namespace Augusta_Flickr_Laba
                     he.InvokeMember("click");
                 }
             }
-            //string s = webBrowser1.Document.Url.OriginalString;
+
             webBrowser1.Navigate(new Uri(webBrowser1.Document.Url.OriginalString));
             while (webBrowser1.ReadyState != WebBrowserReadyState.Complete)
             {
@@ -147,64 +143,13 @@ namespace Augusta_Flickr_Laba
                     he.InvokeMember("click");
                 }
             }
-            while (webBrowser1.ReadyState != WebBrowserReadyState.Complete)
-            {
-                Application.DoEvents();
-            }
-            while (webBrowser1.ReadyState != WebBrowserReadyState.Complete)
-            {
-                Application.DoEvents();
-            }
-            string s = webBrowser1.Document.Url.OriginalString;
-            
-            //web = new HttpClient();
-
-            //Uri uri = new Uri(authorizeString);
-           // var client = new HttpClient();
-            //var resp = await client.GetAsync(uri);
-           // var str = await resp.Content.ReadAsStringAsync();
-           //
-            //var request = (HttpWebRequest)WebRequest.Create(authorizeString);
-            //var response = (HttpWebResponse)request.GetResponse();
-
-            //var str = await resp.Content.ReadAsStringAsync();
-            //return str;
-
-            //HttpContent hc ;
-            //hc.Headers.Add("oauth_token", "72157626737672178-022bbd2f4c2f3432");
-
-            //string result2 = (await web.PostAsync(authorizeString, hc)).ToString();
+            //while (webBrowser1.ReadyState != WebBrowserReadyState.Complete)
+            //{
+            //    Application.DoEvents();
+            //}
+            //string s = await webBrowser1.Url.OriginalString;
 
 
-
-            //requestString = "https://www.flickr.com/services/oauth/access_token";
-            ////generate a random nonce and a timestamp
-            //rand = new Random();
-            //nonce = rand.Next(999999).ToString();
-            //timestamp = GetTimestamp();
-
-            ////create the parameter string in alphabetical order
-            //parameters = "oauth_callback=" + UrlHelper.Encode("http://www.example.com");
-            //parameters += "&oauth_consumer_key=" + ConsumerKey;
-            //parameters += "&oauth_nonce=" + nonce;
-            //parameters += "&oauth_signature_method=HMAC-SHA1";
-            //parameters += "&oauth_timestamp=" + timestamp;
-            //parameters += "&oauth_version=1.0";
-
-            ////generate a signature base on the current requeststring and parameters
-            //string signature = generateSignature("GET", requestString, parameters);
-
-
-
-            //Getting a Request Token
-            //add the parameters and signature to the requeststring
-            //string RequestTokenString = requestString + "?" + parameters + "&oauth_signature=" + signature;
-            //HttpClient web = new HttpClient();
-            //string result = await web.GetStringAsync(RequestTokenString);
-            //textBox3.Text = result;
-
-
-            //GetPhoto();
         }
 
         private async void GetPhoto()
@@ -250,14 +195,14 @@ namespace Augusta_Flickr_Laba
 
 
                     //generate WEbRequest to load image
-                     WebRequest request = WebRequest.Create(new Uri(baseFlickrUrl));
-                     WebResponse response = request.GetResponse();
-                     Stream responseStream = response.GetResponseStream();
-                     Bitmap img = new Bitmap(responseStream);
- 
+                    WebRequest request = WebRequest.Create(new Uri(baseFlickrUrl));
+                    WebResponse response = request.GetResponse();
+                    Stream responseStream = response.GetResponseStream();
+                    Bitmap img = new Bitmap(responseStream);
+
 
                     //set image to picturebox 
-                    pictureBox1.Image = ResizeBitmap(img,pictureBox1.Width,pictureBox1.Height);
+                    pictureBox1.Image = ResizeBitmap(img, pictureBox1.Width, pictureBox1.Height);
                     button1.Enabled = true;
 
                     //break to load only one image
@@ -329,13 +274,122 @@ namespace Augusta_Flickr_Laba
             return epoch.ToString();
         }
 
+        public async void GetA(string s)
+        {
+            //Exchanging the Request Token for an Access Token
+
+            //Signing Requests
+            string requestString = "https://www.flickr.com/services/oauth/request_token";
+
+            //generate a random nonce and a timestamp
+            Random rand = new Random();
+            string nonce = rand.Next(999999).ToString();
+            string timestamp = GetTimestamp();
+
+            //create the parameter string in alphabetical order
+            string parameters = "oauth_callback=" + UrlHelper.Encode("http://www.example.com");
+            parameters += "&oauth_consumer_key=" + ConsumerKey;
+            parameters += "&oauth_nonce=" + nonce;
+            parameters += "&oauth_signature_method=HMAC-SHA1";
+            parameters += "&oauth_timestamp=" + timestamp;
+            parameters += "&oauth_version=1.0";
+
+            //generate a signature base on the current requeststring and parameters
+            string signature = generateSignature("GET", requestString, parameters);
+
+            requestString = "http://www.flickr.com/services/oauth/access_token";
+            //generate a random nonce and a timestamp
+            rand = new Random();
+            nonce = rand.Next(999999).ToString();
+            timestamp = GetTimestamp();
+
+            //Getting the User Authorization
+            StringBuilder ab = new StringBuilder(s);
+            int index = 0;
+            for (int i = s.Length - 1; i >= 0; i--)
+                if (s[i] == '&')
+                {
+                    index = i;
+                    break;
+                }
+            string oauth_verifier = ab.Remove(0, index).ToString();
+
+            //create the parameter string in alphabetical order
+            parameters = "";
+            parameters += "oauth_nonce=" + nonce;
+            parameters += "&oauth_timestamp=" + timestamp;
+            parameters += oauth_verifier;
+            parameters += "&oauth_consumer_key=" + ConsumerKey;
+            parameters += "&oauth_signature_method=HMAC-SHA1";
+            parameters += "&oauth_version=1.0";
+            parameters += "&oauth_token=" + oauth_token;
+            parameters += "&oauth_signature=" + signature;
+
+            ////generate a signature base on the current requeststring and parameters
+            //string signature = generateSignature("GET", requestString, parameters);
+
+            string RequestTokenString = requestString + "?" + parameters;
+            HttpClient web = new HttpClient();
+            string result = await web.GetStringAsync(RequestTokenString);
+
+
+            //Calling the Flickr API with OAuth
+            //Signing Requests
+            requestString = "https://www.flickr.com/services/oauth/request_token";
+
+            //generate a random nonce and a timestamp
+            rand = new Random();
+            nonce = rand.Next(999999).ToString();
+            timestamp = GetTimestamp();
+
+            //create the parameter string in alphabetical order
+            parameters = "";
+            parameters = "oauth_callback=" + UrlHelper.Encode("http://www.example.com");
+            parameters += "&oauth_consumer_key=" + ConsumerKey;
+            parameters += "&oauth_nonce=" + nonce;
+            parameters += "&oauth_signature_method=HMAC-SHA1";
+            parameters += "&oauth_timestamp=" + timestamp;
+            parameters += "&oauth_version=1.0";
+
+            //generate a signature base on the current requeststring and parameters
+            signature = generateSignature("GET", requestString, parameters);
+
+
+
+            requestString = "https://api.flickr.com/services/rest";
+            rand = new Random();
+            nonce = rand.Next(999999).ToString();
+            timestamp = GetTimestamp();
+
+            parameters = "";
+            parameters += "nojsoncallback=1 ";
+            parameters += "&oauth_nonce=" + nonce;
+            parameters += "&format=json";
+            parameters += "&oauth_consumer_key=" + ConsumerKey;
+            parameters += "&oauth_timestamp=" + timestamp;
+            parameters += "&oauth_signature_method=HMAC-SHA1";
+            parameters += "&oauth_version=1.0";
+            parameters += "&oauth_token=" + oauth_token;
+            parameters += "&oauth_signature=" + signature;
+            parameters += "&method=flickr.test.login";
+
+            string RestString = requestString + "?" + parameters;
+            web = new HttpClient();
+            result = await web.GetStringAsync(RestString);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            string s = webBrowser1.Url.ToString();
+            GetA(s);
+        }
     }
 
 
 
     //converted from json to c#
 
-       public class Photo
+    public class Photo
     {
         public string id { get; set; }
         public string owner { get; set; }
