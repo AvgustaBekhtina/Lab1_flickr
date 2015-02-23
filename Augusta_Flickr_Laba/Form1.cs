@@ -24,6 +24,7 @@ namespace Augusta_Flickr_Laba
         //request token (can save it to settings, to use it with auth)
         private static string request_token = "";
         private string oauth_token = "";
+        private string signature = "";
 
         public Form1()
         {
@@ -75,7 +76,7 @@ namespace Augusta_Flickr_Laba
             parameters += "&oauth_version=1.0";
 
             //generate a signature base on the current requeststring and parameters
-            string signature = generateSignature("GET", requestString, parameters);
+            signature = generateSignature("GET", requestString, parameters);
 
 
 
@@ -107,42 +108,42 @@ namespace Augusta_Flickr_Laba
                 Application.DoEvents();
             }
 
-            webBrowser1.Document.GetElementById("Username").SetAttribute("value", "avgustabehtina");
-            //здесь нужно заполнить поле пароль  
-            webBrowser1.Document.GetElementById("passwd").InnerText = "Nachpts12";
-            // здесь нужно нажать кнопку войти
-            foreach (HtmlElement he in webBrowser1.Document.GetElementsByTagName("button"))
-            {
-                if (he.GetAttribute("id").Equals("login-signin"))
-                {
-                    he.InvokeMember("click");
-                }
-            }
+            //webBrowser1.Document.GetElementById("Username").SetAttribute("value", "avgustabehtina");
+            ////здесь нужно заполнить поле пароль  
+            //webBrowser1.Document.GetElementById("passwd").InnerText = "Nachpts12";
+            //// здесь нужно нажать кнопку войти
+            //foreach (HtmlElement he in webBrowser1.Document.GetElementsByTagName("button"))
+            //{
+            //    if (he.GetAttribute("id").Equals("login-signin"))
+            //    {
+            //        he.InvokeMember("click");
+            //    }
+            //}
 
-            webBrowser1.Navigate(new Uri(webBrowser1.Document.Url.OriginalString));
-            while (webBrowser1.ReadyState != WebBrowserReadyState.Complete)
-            {
-                Application.DoEvents();
-            }
-            foreach (HtmlElement he in webBrowser1.Document.GetElementsByTagName("input"))
-            {
-                if (he.GetAttribute("type").Equals("submit"))
-                {
-                    he.InvokeMember("click");
-                }
-            }
-            webBrowser1.Navigate(new Uri(webBrowser1.Document.Url.OriginalString));
-            while (webBrowser1.ReadyState != WebBrowserReadyState.Complete)
-            {
-                Application.DoEvents();
-            }
-            foreach (HtmlElement he in webBrowser1.Document.GetElementsByTagName("input"))
-            {
-                if (he.GetAttribute("type").Equals("submit"))
-                {
-                    he.InvokeMember("click");
-                }
-            }
+            //webBrowser1.Navigate(new Uri(webBrowser1.Document.Url.OriginalString));
+            //while (webBrowser1.ReadyState != WebBrowserReadyState.Complete)
+            //{
+            //    Application.DoEvents();
+            //}
+            //foreach (HtmlElement he in webBrowser1.Document.GetElementsByTagName("input"))
+            //{
+            //    if (he.GetAttribute("type").Equals("submit"))
+            //    {
+            //        he.InvokeMember("click");
+            //    }
+            //}
+            //webBrowser1.Navigate(new Uri(webBrowser1.Document.Url.OriginalString));
+            //while (webBrowser1.ReadyState != WebBrowserReadyState.Complete)
+            //{
+            //    Application.DoEvents();
+            //}
+            //foreach (HtmlElement he in webBrowser1.Document.GetElementsByTagName("input"))
+            //{
+            //    if (he.GetAttribute("type").Equals("submit"))
+            //    {
+            //        he.InvokeMember("click");
+            //    }
+            //}
             //while (webBrowser1.ReadyState != WebBrowserReadyState.Complete)
             //{
             //    Application.DoEvents();
@@ -297,7 +298,7 @@ namespace Augusta_Flickr_Laba
             //generate a signature base on the current requeststring and parameters
             string signature = generateSignature("GET", requestString, parameters);
 
-            requestString = "http://www.flickr.com/services/oauth/access_token";
+            requestString = "https://www.flickr.com/services/oauth/access_token";
             //generate a random nonce and a timestamp
             rand = new Random();
             nonce = rand.Next(999999).ToString();
@@ -325,8 +326,7 @@ namespace Augusta_Flickr_Laba
             parameters += "&oauth_token=" + oauth_token;
             parameters += "&oauth_signature=" + signature;
 
-            ////generate a signature base on the current requeststring and parameters
-            //string signature = generateSignature("GET", requestString, parameters);
+            //generate a signature base on the current requeststring and parameters
 
             string RequestTokenString = requestString + "?" + parameters;
             HttpClient web = new HttpClient();
